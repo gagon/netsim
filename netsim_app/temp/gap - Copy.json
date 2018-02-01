@@ -1,0 +1,216 @@
+{
+  "seps":{
+    "kpc":{
+      "label":"KPC",
+      "pres":80.0,
+      "results": {
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "u2":{
+      "label":"Unit-2",
+      "pres":80.0,
+      "results": {
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "u3":{
+      "label":"Unit-3",
+      "pres":130.0,
+      "results": {
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    }
+  },
+  "joints":{
+    "rmsm":{
+      "label": "RMS-M",
+      "results": {
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "rmsm_tl1":{
+      "label": "TL1",
+      "results": {
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "rmsm_tl2":{
+      "label": "TL2",
+      "results": {
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    }
+  },
+  "pipes":{
+    "rmsm_kpc":{
+      "corr": {
+        "a": 0.9,
+        "b": 0.0,
+        "type": "linear"
+      },
+      "from": "rmsm",
+      "to": "kpc",
+      "id": 4.5,
+      "label": "",
+      "lenght": 100.0,
+      "masked": 0,
+      "results": {
+        "dp": 0,
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "rmsm_rmsm_tl1":{
+      "corr": {
+        "a": 0.9,
+        "b": 0.0,
+        "type": "linear"
+      },
+      "from": "rmsm_tl1",
+      "to": "rmsm",
+      "id": 4.5,
+      "label": "",
+      "lenght": 100.0,
+      "masked": 0,
+      "results": {
+        "dp": 0,
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "rmsm_rmsm_tl2":{
+      "corr": {
+        "a": 0.9,
+        "b": 0.0,
+        "type": "linear"
+      },
+      "from": "rmsm_tl2",
+      "to": "rmsm",
+      "id": 4.5,
+      "label": "",
+      "lenght": 100.0,
+      "masked": 0,
+      "results": {
+        "dp": 0,
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "p_15_tl1":{
+      "corr": {
+        "a": 0.9,
+        "b": 0.0,
+        "type": "linear"
+      },
+      "from": "15",
+      "to": "rmsm_tl1",
+      "id": 4.5,
+      "label": "",
+      "lenght": 100.0,
+      "masked": 0,
+      "results": {
+        "dp": 0,
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "p_9815_tl1":{
+      "corr": {
+        "a": 0.9,
+        "b": 0.0,
+        "type": "linear"
+      },
+      "from": "9815",
+      "to": "rmsm_tl1",
+      "id": 4.5,
+      "label": "",
+      "lenght": 100.0,
+      "masked": 1,
+      "results": {
+        "dp": 0,
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    },
+    "p_9815_tl2":{
+      "corr": {
+          "a": 0.9,
+          "b": 0.0,
+          "type": "linear"
+      },
+      "from": "9815",
+      "to": "rmsm_tl2",
+      "id": 4.5,
+      "label": "",
+      "lenght": 100.0,
+      "masked": 0,
+      "results": {
+        "dp": 0,
+        "pres": 0,
+        "qgas": 0,
+        "qoil": 0,
+        "qwat": 0
+      }
+    }
+  },
+  "wells":{
+    "15":{
+      "label":"15",
+      "gor":1000.0,
+      "wct":0.0,
+      "pc":{
+        "fwhps":[1.01,250.0],
+        "qoil":[1000.0,0.0]
+      },
+      "results":{
+        "fwhp":0,
+        "dp":0,
+        "qoil":0,
+        "qgas":0,
+        "qwat":0
+      }
+    },
+    "9815":{
+      "label":"9815",
+      "gor":500.0,
+      "wct":10.0,
+      "pc":{
+        "fwhps":[1.01,250.0],
+        "qoil":[1000.0,0.0]
+      },
+      "results":{
+        "fwhp":0,
+        "dp":0,
+        "qoil":0,
+        "qgas":0,
+        "qwat":0
+      }
+    }
+  }
+}
