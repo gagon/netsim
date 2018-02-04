@@ -1,33 +1,142 @@
 {
     "joints": {
+        "rmsd": {
+            "label": "RMS-D",
+            "results": {
+                "pres": 85.554768379225,
+                "qgas": 931.7643282376761,
+                "qoil": 883.569621559308,
+                "qwat": 14.905579371493634
+            }
+        },
+        "rmsd_tl1": {
+            "label": "TL1",
+            "results": {
+                "pres": 89.93954671499368,
+                "qgas": 771.1153061519371,
+                "qoil": 481.9470663449607,
+                "qwat": 14.905579371493634
+            }
+        },
+        "rmsd_tl2": {
+            "label": "TL2",
+            "results": {
+                "pres": 86.7247584226813,
+                "qgas": 160.6490220857389,
+                "qoil": 401.62255521434724,
+                "qwat": 0.0
+            }
+        },
         "rmsm": {
             "label": "RMS-M",
             "results": {
-                "pres": 83.6919290148336,
-                "qgas": 632.9458423544733,
-                "qoil": 883.5546813398246,
-                "qwat": 53.548897219092154
+                "pres": 81.12084353854459,
+                "qgas": 160.6490220490825,
+                "qoil": 401.6225551227062,
+                "qwat": 0.0
             }
         },
         "rmsm_tl1": {
             "label": "TL1",
             "results": {
-                "pres": 87.38385802966721,
-                "qgas": 632.9458423544733,
-                "qoil": 883.5546813398246,
-                "qwat": 53.548897219092154
+                "pres": 82.24168707708918,
+                "qgas": 160.6490220490825,
+                "qoil": 401.6225551227062,
+                "qwat": 0.0
             }
         },
         "rmsm_tl2": {
             "label": "TL2",
             "results": {
-                "pres": 83.6919290148336,
+                "pres": 81.12084353854459,
                 "qgas": 0.0,
                 "qoil": 0.0,
                 "qwat": 0.0
             }
         }
     },
+    "network": [
+        [
+            [
+                {
+                    "from_item": "rmsm",
+                    "from_item_type": "joints",
+                    "pipe": "rmsm_kpc",
+                    "to_item": "kpc",
+                    "to_item_type": "seps"
+                }
+            ],
+            [
+                {
+                    "from_item": "rmsm_tl1",
+                    "from_item_type": "joints",
+                    "pipe": "rmsm_rmsm_tl1",
+                    "to_item": "rmsm",
+                    "to_item_type": "joints"
+                },
+                {
+                    "from_item": "rmsm_tl2",
+                    "from_item_type": "joints",
+                    "pipe": "rmsm_rmsm_tl2",
+                    "to_item": "rmsm",
+                    "to_item_type": "joints"
+                }
+            ],
+            [
+                {
+                    "from_item": "15",
+                    "from_item_type": "wells",
+                    "pipe": "p_15_tl1",
+                    "to_item": "rmsm_tl1",
+                    "to_item_type": "joints"
+                }
+            ]
+        ],
+        [
+            [
+                {
+                    "from_item": "rmsd",
+                    "from_item_type": "joints",
+                    "pipe": "rmsd_u2",
+                    "to_item": "u2",
+                    "to_item_type": "seps"
+                }
+            ],
+            [
+                {
+                    "from_item": "rmsd_tl1",
+                    "from_item_type": "joints",
+                    "pipe": "rmsd_rmsd_tl1",
+                    "to_item": "rmsd",
+                    "to_item_type": "joints"
+                },
+                {
+                    "from_item": "rmsd_tl2",
+                    "from_item_type": "joints",
+                    "pipe": "rmsd_rmsd_tl2",
+                    "to_item": "rmsd",
+                    "to_item_type": "joints"
+                }
+            ],
+            [
+                {
+                    "from_item": "9830",
+                    "from_item_type": "wells",
+                    "pipe": "p_9830_tl1",
+                    "to_item": "rmsd_tl1",
+                    "to_item_type": "joints"
+                },
+                {
+                    "from_item": "430",
+                    "from_item_type": "wells",
+                    "pipe": "p_430_tl2",
+                    "to_item": "rmsd_tl2",
+                    "to_item_type": "joints"
+                }
+            ]
+        ],
+        []
+    ],
     "pipes": {
         "p_15_tl1": {
             "corr": {
@@ -41,13 +150,53 @@
             "lenght": 100.0,
             "masked": 0,
             "results": {
-                "dp": 2.1689034086219863,
-                "pres": 87.38385802966721,
-                "qgas": 401.64877937444066,
-                "qoil": 401.64877937444066,
+                "dp": 1.120843538544591,
+                "pres": 82.24168707708918,
+                "qgas": 166.050894599199,
+                "qoil": 415.1272364979975,
                 "qwat": 0.0
             },
             "to": "rmsm_tl1"
+        },
+        "p_430_tl1": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "430",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 1,
+            "results": {
+                "dp": 0.0,
+                "pres": 0.0,
+                "qgas": 0.0,
+                "qoil": 0.0,
+                "qwat": 0.0
+            },
+            "to": "rmsd_tl1"
+        },
+        "p_430_tl2": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "430",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 0,
+            "results": {
+                "dp": 1.169990043456309,
+                "pres": 86.7247584226813,
+                "qgas": 173.33185828982354,
+                "qoil": 433.3296457245589,
+                "qwat": 0.0
+            },
+            "to": "rmsd_tl2"
         },
         "p_9815_tl1": {
             "corr": {
@@ -61,11 +210,11 @@
             "lenght": 100.0,
             "masked": 0,
             "results": {
-                "dp": 1.5230256062116325,
-                "pres": 87.38385802966721,
-                "qgas": 231.34566170303233,
-                "qoil": 481.970128547984,
-                "qwat": 53.55223650533156
+                "dp": 0.0,
+                "pres": 0.0,
+                "qgas": 0.0,
+                "qoil": 0.0,
+                "qwat": 0.0
             },
             "to": "rmsm_tl1"
         },
@@ -81,13 +230,113 @@
             "lenght": 100.0,
             "masked": 1,
             "results": {
-                "dp": 0,
-                "pres": 0,
-                "qgas": 0,
-                "qoil": 0,
-                "qwat": 0
+                "dp": 0.0,
+                "pres": 0.0,
+                "qgas": 0.0,
+                "qoil": 0.0,
+                "qwat": 0.0
             },
             "to": "rmsm_tl2"
+        },
+        "p_9830_tl1": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "9830",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 0,
+            "results": {
+                "dp": 4.3847783357686865,
+                "pres": 89.93954671499368,
+                "qgas": 863.1628585886607,
+                "qoil": 539.4767866179129,
+                "qwat": 16.6848490706571
+            },
+            "to": "rmsd_tl1"
+        },
+        "p_9830_tl2": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "9830",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 1,
+            "results": {
+                "dp": 0.0,
+                "pres": 0.0,
+                "qgas": 0.0,
+                "qoil": 0.0,
+                "qwat": 0.0
+            },
+            "to": "rmsd_tl2"
+        },
+        "rmsd_rmsd_tl1": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "rmsd_tl1",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 0,
+            "results": {
+                "dp": 4.3847783357686865,
+                "pres": 85.554768379225,
+                "qgas": 863.1628585886607,
+                "qoil": 539.4767866179129,
+                "qwat": 16.6848490706571
+            },
+            "to": "rmsd"
+        },
+        "rmsd_rmsd_tl2": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "rmsd_tl2",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 0,
+            "results": {
+                "dp": 1.169990043456309,
+                "pres": 85.554768379225,
+                "qgas": 173.33185828982354,
+                "qoil": 433.3296457245589,
+                "qwat": 0.0
+            },
+            "to": "rmsd"
+        },
+        "rmsd_u2": {
+            "corr": {
+                "a": 0.9,
+                "b": 0.0,
+                "type": "linear"
+            },
+            "from": "rmsd",
+            "id": 4.5,
+            "label": "",
+            "lenght": 100.0,
+            "masked": 0,
+            "results": {
+                "dp": 5.5547683792249956,
+                "pres": 80.0,
+                "qgas": 1036.4947168784843,
+                "qoil": 972.8064323424718,
+                "qwat": 16.6848490706571
+            },
+            "to": "u2"
         },
         "rmsm_kpc": {
             "corr": {
@@ -101,11 +350,11 @@
             "lenght": 100.0,
             "masked": 0,
             "results": {
-                "dp": 3.6919290148336046,
+                "dp": 1.120843538544591,
                 "pres": 80.0,
-                "qgas": 632.994441077473,
-                "qoil": 883.6189079224247,
-                "qwat": 53.55223650533156
+                "qgas": 166.050894599199,
+                "qoil": 415.1272364979975,
+                "qwat": 0.0
             },
             "to": "kpc"
         },
@@ -121,11 +370,11 @@
             "lenght": 100.0,
             "masked": 0,
             "results": {
-                "dp": 3.6919290148336046,
-                "pres": 83.6919290148336,
-                "qgas": 632.994441077473,
-                "qoil": 883.6189079224247,
-                "qwat": 53.55223650533156
+                "dp": 1.120843538544591,
+                "pres": 81.12084353854459,
+                "qgas": 166.050894599199,
+                "qoil": 415.1272364979975,
+                "qwat": 0.0
             },
             "to": "rmsm"
         },
@@ -142,7 +391,7 @@
             "masked": 0,
             "results": {
                 "dp": 0.0,
-                "pres": 83.6919290148336,
+                "pres": 81.12084353854459,
                 "qgas": 0.0,
                 "qoil": 0.0,
                 "qwat": 0.0
@@ -155,18 +404,18 @@
             "label": "KPC",
             "pres": 80.0,
             "results": {
-                "qgas": 632.9458423544733,
-                "qoil": 883.5546813398246,
-                "qwat": 53.548897219092154
+                "qgas": 326.6999166482815,
+                "qoil": 816.7497916207037,
+                "qwat": 0.0
             }
         },
         "u2": {
             "label": "Unit-2",
             "pres": 80.0,
             "results": {
-                "qgas": 0.0,
-                "qoil": 0.0,
-                "qwat": 0.0
+                "qgas": 1968.2590451161605,
+                "qoil": 1856.3760539017799,
+                "qwat": 31.590428442150735
             }
         },
         "u3": {
@@ -184,8 +433,9 @@
             "constraints": {
                 "fwhp_min": 150.0
             },
-            "gor": 500.0,
+            "gor": 400.0,
             "label": "15",
+            "masked": 0,
             "pc": {
                 "fwhps": [
                     1.01,
@@ -197,11 +447,38 @@
                 ]
             },
             "results": {
-                "dp": 60.44921772214367,
-                "fwhp": 150.00197916043288,
-                "pres": 89.5527614382892,
-                "qgas": 401.6146063679952,
-                "qoil": 401.6146063679952,
+                "dp": 66.63746938436358,
+                "fwhp": 149.99999999999736,
+                "pres": 83.36253061563377,
+                "qgas": 160.6490220490825,
+                "qoil": 401.6225551227062,
+                "qwat": 0.0
+            },
+            "wct": 0.0
+        },
+        "430": {
+            "constraints": {
+                "fwhp_min": 150.0
+            },
+            "gor": 400.0,
+            "label": "15",
+            "masked": 0,
+            "pc": {
+                "fwhps": [
+                    1.01,
+                    250.0
+                ],
+                "qoil": [
+                    1000.0,
+                    0.0
+                ]
+            },
+            "results": {
+                "dp": 62.105251511042056,
+                "fwhp": 149.99999997717967,
+                "pres": 87.89474846613761,
+                "qgas": 160.6490220857389,
+                "qoil": 401.62255521434724,
                 "qwat": 0.0
             },
             "wct": 0.0
@@ -212,6 +489,7 @@
             },
             "gor": 1600.0,
             "label": "9815",
+            "masked": 1,
             "pc": {
                 "fwhps": [
                     1.01,
@@ -223,14 +501,41 @@
                 ]
             },
             "results": {
-                "dp": 41.094857096885335,
-                "fwhp": 130.00174073276418,
-                "pres": 88.90688363587884,
-                "qgas": 231.3312359864781,
-                "qoil": 481.9400749718294,
-                "qwat": 53.548897219092154
+                "dp": 0.0,
+                "fwhp": 0.0,
+                "pres": 0.0,
+                "qgas": 0.0,
+                "qoil": 0.0,
+                "qwat": 0.0
             },
             "wct": 10.0
+        },
+        "9830": {
+            "constraints": {
+                "fwhp_min": 130.0
+            },
+            "gor": 1600.0,
+            "label": "9815",
+            "masked": 0,
+            "pc": {
+                "fwhps": [
+                    1.01,
+                    250.0
+                ],
+                "qoil": [
+                    1000.0,
+                    0.0
+                ]
+            },
+            "results": {
+                "dp": 35.67567490000586,
+                "fwhp": 129.99999995076823,
+                "pres": 94.32432505076237,
+                "qgas": 771.1153061519371,
+                "qoil": 481.9470663449607,
+                "qwat": 14.905579371493634
+            },
+            "wct": 3.0
         }
     }
 }

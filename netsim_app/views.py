@@ -20,6 +20,10 @@ def index_api():
     gap=ns.read_gap_file()
     return jsonify({"data":gap})
 
+@app.route('/api/build_network')
+def build_network_api():
+    gap=ns.build_network()
+    return jsonify({"data":"network built!"})
 
 @app.route('/api/calculate_network')
 def calculate_network_api():
@@ -70,6 +74,7 @@ def set_item_all_api():
     vals=request.get_json()["vals"]
     gap=ns.read_gap_file()
     gap=ns.DoSetAll(gap,code,param,vals)
+    code+="/**/"+param
     items=ns.DoGetAll(gap,code)
     return jsonify({"data":items})
 
