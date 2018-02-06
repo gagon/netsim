@@ -65,11 +65,12 @@ def clear_results(gap):
 def build_network():
 
     gap=read_gap_file()
-    gap=clear_results(gap)
+    # gap=clear_results(gap)
     pipe_list=sorted(list(gap["pipes"].keys()))
     well_list=sorted(list(gap["wells"].keys()))
     joint_list=sorted(list(gap["joints"].keys()))
     sep_list=sorted(list(gap["seps"].keys()))
+    # print(pipe_list)
 
     seps=[]
     for sep in sep_list: # highest level of network elements
@@ -77,6 +78,11 @@ def build_network():
         from_item_type="seps"
         to_item=""
         to_item_type=""
+        if gap["seps"][sep]["masked"]==0:
+            from_maskflag=0
+        else:
+            from_maskflag=1
+        gap["seps"][sep]["maskflag"]=from_maskflag
 
         sep_list_parent=[]
         sep_list_parent.append({
@@ -84,7 +90,8 @@ def build_network():
             "to_item":to_item,
             "pipe":"",
             "from_item_type":from_item_type,
-            "to_item_type":to_item_type
+            "to_item_type":to_item_type,
+            "from_maskflag":from_maskflag
         })
 
         parents=sep_list_parent
@@ -97,7 +104,6 @@ def build_network():
 
                 # continue build network
                 for p in pipe_list:
-                    print(parent["from_item"])
                     if gap["pipes"][p]["masked"]==0: # check if pipe is masked
                         if gap["pipes"][p]["to"]==parent["from_item"]:
 
@@ -106,19 +112,26 @@ def build_network():
                             to_item=gap["pipes"][p]["to"]
                             to_item_type=get_type(gap,to_item)
 
-                            from_maskflag=0
-                            if "masked" in gap[from_item_type][from_item]:
-                                if gap[from_item_type][from_item]["masked"]==1:
-                                    from_maskflag=1
+                            if parent["from_maskflag"]==1:
+                                from_maskflag=1
+                            else:
+                                from_maskflag=0
+                                if "masked" in gap[from_item_type][from_item]:
+                                    if gap[from_item_type][from_item]["masked"]==1:
+                                        from_maskflag=1
+                            gap[from_item_type][from_item]["maskflag"]=from_maskflag
+                            gap["pipes"][p]["maskflag"]=from_maskflag
 
-                            if from_maskflag==0:
-                                children.append({
-                                    "from_item":from_item,
-                                    "to_item":to_item,
-                                    "pipe":p,
-                                    "from_item_type":from_item_type,
-                                    "to_item_type":to_item_type
-                                })
+                            children.append({
+                                "from_item":from_item,
+                                "from_item_type":from_item_type,
+                                "to_item":to_item,
+                                "to_item_type":to_item_type,
+                                "pipe":p,
+                                "from_maskflag":from_maskflag
+                            })
+                    else:
+                        gap["pipes"][p]["maskflag"]=1
 
             if children:
                 levels.append(children)
@@ -156,44 +169,46 @@ def calculate_network():
                         to_item_type=l["to_item_type"]
                         from_item=l["from_item"]
                         from_item_type=l["from_item_type"]
+                        from_maskflag=l["from_maskflag"]
+
+                        if from_maskflag==0:
+                            if to_item_type=="seps":
+                                pres_in=gap["seps"][to_item]["pres"]
+                            elif to_item_type=="joints":
+                                pres_in=gap["joints"][to_item]["results"]["pres"]
+
+                            qgas=gap[from_item_type][from_item]["results"]["qgas"]
+                            qoil=gap[from_item_type][from_item]["results"]["qoil"]
+                            qwat=gap[from_item_type][from_item]["results"]["qwat"]
+                            qtot=qgas*5.0+qoil+qwat
 
 
-                        if to_item_type=="seps":
-                            pres_in=gap["seps"][to_item]["pres"]
-                        elif to_item_type=="joints":
-                            pres_in=gap["joints"][to_item]["results"]["pres"]
-                        qgas=gap[from_item_type][from_item]["results"]["qgas"]
-                        qoil=gap[from_item_type][from_item]["results"]["qoil"]
-                        qwat=gap[from_item_type][from_item]["results"]["qwat"]
-                        qtot=qgas*5.0+qoil+qwat
+                            pres_out=calculate_pres_drop(gap["pipes"][l["pipe"]],pres_in,qtot)
 
+                            gap["pipes"][l["pipe"]]["results"]["pres"]=pres_in
+                            gap["pipes"][l["pipe"]]["results"]["dp"]=pres_out-pres_in
+                            gap["pipes"][l["pipe"]]["results"]["qgas"]=qgas
+                            gap["pipes"][l["pipe"]]["results"]["qoil"]=qoil
+                            gap["pipes"][l["pipe"]]["results"]["qwat"]=qwat
 
-                        pres_out=calculate_pres_drop(gap["pipes"][l["pipe"]],pres_in,qtot)
+                            if from_item_type=="wells":
 
-                        gap["pipes"][l["pipe"]]["results"]["pres"]=pres_in
-                        gap["pipes"][l["pipe"]]["results"]["dp"]=pres_out-pres_in
-                        gap["pipes"][l["pipe"]]["results"]["qgas"]=qgas
-                        gap["pipes"][l["pipe"]]["results"]["qoil"]=qoil
-                        gap["pipes"][l["pipe"]]["results"]["qwat"]=qwat
-
-                        if from_item_type=="wells":
-
-                            dp=gap["wells"][from_item]["results"]["dp"]
-                            gap["wells"][from_item]["results"]["pres"]=pres_out
-                            gap["wells"][from_item]["results"]["fwhp"]=pres_out+dp
-                            gap["wells"][from_item]["results"]["qoil"]=\
-                                np.interp(gap["wells"][from_item]["results"]["fwhp"],\
-                                            gap["wells"][from_item]["pc"]["fwhps"],gap["wells"][from_item]["pc"]["qoil"])
-                            gap["wells"][from_item]["results"]["qgas"]=gap["wells"][from_item]["results"]["qoil"]*gap["wells"][from_item]["gor"]/1000.0
-                            gap["wells"][from_item]["results"]["qwat"]=gap["wells"][from_item]["results"]["qoil"]*\
-                                                                        gap["wells"][from_item]["wct"]/100.0/(1.0-gap["wells"][from_item]["wct"]/100.0)
-                            # print(gap["wells"][from_item]["results"]["fwhp"],pres_out,dp)
-                            if iters==0:
-                                tol+=1.0
-                            else:
-                                tol+=abs(gap["wells"][from_item]["results"]["fwhp"]-pres_out-dp) # point of checking if convergence is reached
-                        elif from_item_type=="joints":
-                            gap["joints"][from_item]["results"]["pres"]=pres_out
+                                dp=gap["wells"][from_item]["results"]["dp"]
+                                gap["wells"][from_item]["results"]["pres"]=pres_out
+                                gap["wells"][from_item]["results"]["fwhp"]=pres_out+dp
+                                gap["wells"][from_item]["results"]["qoil"]=\
+                                    np.interp(gap["wells"][from_item]["results"]["fwhp"],\
+                                                gap["wells"][from_item]["pc"]["fwhps"],gap["wells"][from_item]["pc"]["qoil"])
+                                gap["wells"][from_item]["results"]["qgas"]=gap["wells"][from_item]["results"]["qoil"]*gap["wells"][from_item]["gor"]/1000.0
+                                gap["wells"][from_item]["results"]["qwat"]=gap["wells"][from_item]["results"]["qoil"]*\
+                                                                            gap["wells"][from_item]["wct"]/100.0/(1.0-gap["wells"][from_item]["wct"]/100.0)
+                                # print(gap["wells"][from_item]["results"]["fwhp"],pres_out,dp)
+                                if iters==0:
+                                    tol+=1.0
+                                else:
+                                    tol+=abs(gap["wells"][from_item]["results"]["fwhp"]-pres_out-dp) # point of checking if convergence is reached
+                            elif from_item_type=="joints":
+                                gap["joints"][from_item]["results"]["pres"]=pres_out
 
 
                 for level in levels: # init rates for calculating aggregates
@@ -213,14 +228,16 @@ def calculate_network():
                         to_item_type=l["to_item_type"]
                         from_item=l["from_item"]
                         from_item_type=l["from_item_type"]
+                        from_maskflag=l["from_maskflag"]
 
-                        qgas_in=gap[from_item_type][from_item]["results"]["qgas"]
-                        qoil_in=gap[from_item_type][from_item]["results"]["qoil"]
-                        qwat_in=gap[from_item_type][from_item]["results"]["qwat"]
+                        if from_maskflag==0:
+                            qgas_in=gap[from_item_type][from_item]["results"]["qgas"]
+                            qoil_in=gap[from_item_type][from_item]["results"]["qoil"]
+                            qwat_in=gap[from_item_type][from_item]["results"]["qwat"]
 
-                        gap[to_item_type][to_item]["results"]["qgas"]+=qgas_in
-                        gap[to_item_type][to_item]["results"]["qoil"]+=qoil_in
-                        gap[to_item_type][to_item]["results"]["qwat"]+=qwat_in
+                            gap[to_item_type][to_item]["results"]["qgas"]+=qgas_in
+                            gap[to_item_type][to_item]["results"]["qoil"]+=qoil_in
+                            gap[to_item_type][to_item]["results"]["qwat"]+=qwat_in
 
                 iters+=1
 
@@ -237,14 +254,11 @@ def optimize_network():
     while tol>0.01 and iters<10:
         tol=0.0
         for well in wells:
-            if gap["wells"][well]["masked"]==0:
+            if gap["wells"][well]["maskflag"]==0:
                 fwhp_min=gap["wells"][well]["constraints"]["fwhp_min"]
                 fwhp=gap["wells"][well]["results"]["fwhp"]
                 pres=gap["wells"][well]["results"]["pres"] # flowline pressure (choke downstream pressure)
                 dp=gap["wells"][well]["results"]["dp"]
-                # if well=="9815":
-                #     print("===")
-                #     print(well,fwhp_min,fwhp,dp,iters)
 
 
                 if iters==0:
@@ -255,11 +269,8 @@ def optimize_network():
                     tol+=dp
                 print(well,fwhp_min,pres,dp)
 
-
                 gap["wells"][well]["results"]["dp"]=dp
-                # if well=="9815":
-                #     print(well,fwhp_min,fwhp,dp,iters)
-                # print(well,dp,iters)
+
         iters+=1
         print(iters,tol)
 

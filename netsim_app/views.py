@@ -38,7 +38,7 @@ def optimize_network_api():
 
 @app.route('/api/doget', methods=["POST"])
 def get_item_api():
-    print(request)
+    # print(request)
     code=request.get_json()["path"]
     gap=ns.read_gap_file()
     item=ns.DoGet(gap,code)
@@ -47,7 +47,7 @@ def get_item_api():
 
 @app.route('/api/dogetall', methods=["POST"])
 def get_item_all_api():
-    print(request.get_json())
+    # print(request.get_json())
     code=request.get_json()["path"]
     search=request.get_json()["search"]
 
