@@ -213,12 +213,12 @@ def calculate_network():
 
                 for level in levels: # init rates for calculating aggregates
                     for l in level:
-                        if l["to_item_type"]=="joints":
+                        to_item_type=l["to_item_type"]
+                        if to_item_type=="joints" or to_item_type=="seps":
                             to_item=l["to_item"]
                             gap[to_item_type][to_item]["results"]["qgas"]=0.0
                             gap[to_item_type][to_item]["results"]["qoil"]=0.0
                             gap[to_item_type][to_item]["results"]["qwat"]=0.0
-
 
 
                 for level in levels[::-1]:
@@ -256,23 +256,48 @@ def optimize_network():
         for well in wells:
             if gap["wells"][well]["maskflag"]==0:
                 fwhp_min=gap["wells"][well]["constraints"]["fwhp_min"]
+                qgas_max=gap["wells"][well]["constraints"]["qgas_max"]
+                pc=gap["wells"][well]["pc"]
+                gor=gap["wells"][well]["gor"]
                 fwhp=gap["wells"][well]["results"]["fwhp"]
+                qgas=gap["wells"][well]["results"]["qgas"]
                 pres=gap["wells"][well]["results"]["pres"] # flowline pressure (choke downstream pressure)
                 dp=gap["wells"][well]["results"]["dp"]
 
-
+                # print(well)
                 if iters==0:
                     dp=0.0
                     tol+=1.0
-                elif fwhp_min>pres:
-                    dp=fwhp_min-pres
-                    tol+=dp
-                print(well,fwhp_min,pres,dp)
+                else:
+
+                    dps=[]
+                    tols=[]
+                    if fwhp_min>0.0:
+                        if fwhp_min>pres: # check fwhp_min constraints and adjust
+                            dps.append(fwhp_min-pres)
+                            tols.append(fwhp_min-pres)
+
+
+                    if qgas_max>0.0: # check qgas_max constraints and adjust
+                        # qgas_max=float(qgas_max)
+                        if qgas>qgas_max or dp>0.0:
+                            qoil_max=qgas_max/gor*1000.0
+                            fwhp_min=np.interp(qoil_max,sorted(pc["qoil"]),sorted(pc["fwhps"],reverse=True))
+                            # if fwhp_min>pres:
+                            dps.append(fwhp_min-pres)
+                            # print(qgas_max,qgas,fwhp_min,dp,pres)
+                            tols.append(abs(qgas-qgas_max))
+
+                    if dps:
+                        dp=max(dps)
+                        tol_idx=np.argmax(dps)
+                        tol+=tols[tol_idx]
+                # print(well,fwhp_min,pres,dp)
 
                 gap["wells"][well]["results"]["dp"]=dp
 
         iters+=1
-        print(iters,tol)
+        # print(iters,tol)
 
         save_gap_file(gap)
 
@@ -287,10 +312,11 @@ def DoGet(dictionary, path):
 
 def DoSet(dictionary, path, val):
     orig_val=DoGet(dictionary, path)
-    if isinstance(orig_val, int):
-        val=int(val)
-    elif isinstance(orig_val, float):
-        val=float(val)
+    if not orig_val:
+        if isinstance(orig_val, int):
+            val=int(val)
+        elif isinstance(orig_val, float):
+            val=float(val)
 
     dpu.set(dictionary, path, val)
     save_gap_file(dictionary)
