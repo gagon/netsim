@@ -199,6 +199,8 @@ def calculate_network():
                                 gap["wells"][from_item]["results"]["qoil"]=\
                                     np.interp(gap["wells"][from_item]["results"]["fwhp"],\
                                                 gap["wells"][from_item]["pc"]["fwhps"],gap["wells"][from_item]["pc"]["qoil"])
+                                # if from_item=="918":
+                                #     print(gap["wells"][from_item]["results"]["fwhp"],pres_out,dp)
                                 gap["wells"][from_item]["results"]["qgas"]=gap["wells"][from_item]["results"]["qoil"]*gap["wells"][from_item]["gor"]/1000.0
                                 gap["wells"][from_item]["results"]["qwat"]=gap["wells"][from_item]["results"]["qoil"]*\
                                                                             gap["wells"][from_item]["wct"]/100.0/(1.0-gap["wells"][from_item]["wct"]/100.0)
@@ -209,6 +211,8 @@ def calculate_network():
                                     tol+=abs(gap["wells"][from_item]["results"]["fwhp"]-pres_out-dp) # point of checking if convergence is reached
                             elif from_item_type=="joints":
                                 gap["joints"][from_item]["results"]["pres"]=pres_out
+                            # if from_item=="918":
+                            #     print("---")
 
 
                 for level in levels: # init rates for calculating aggregates
@@ -254,7 +258,7 @@ def optimize_network():
     while tol>0.01 and iters<10:
         tol=0.0
         for well in wells:
-            if gap["wells"][well]["maskflag"]==0:
+            if gap["wells"][well]["maskflag"]==0 and gap["wells"][well]["dp_calc"]==1:
                 fwhp_min=gap["wells"][well]["constraints"]["fwhp_min"]
                 qgas_max=gap["wells"][well]["constraints"]["qgas_max"]
                 pc=gap["wells"][well]["pc"]
@@ -279,13 +283,10 @@ def optimize_network():
 
 
                     if qgas_max>0.0: # check qgas_max constraints and adjust
-                        # qgas_max=float(qgas_max)
                         if qgas>qgas_max or dp>0.0:
                             qoil_max=qgas_max/gor*1000.0
                             fwhp_min=np.interp(qoil_max,sorted(pc["qoil"]),sorted(pc["fwhps"],reverse=True))
-                            # if fwhp_min>pres:
                             dps.append(fwhp_min-pres)
-                            # print(qgas_max,qgas,fwhp_min,dp,pres)
                             tols.append(abs(qgas-qgas_max))
 
                     if dps:
@@ -329,12 +330,27 @@ def DoGetAll(dictionary, path):
 
 def DoSetAll(dictionary, path, param, vals):
     path+="/**/"+param
+
     orig_vals=DoGetAll(dictionary, path)
-    orig_vals=sorted(orig_vals,key=lambda x:x[0])
+
+    orig_vals=sorted(orig_vals,key=lambda x:x[0]) # required to keep consistency in setting items by index
 
     if len(orig_vals)==len(vals):
-        for i,v in enumerate(orig_vals):
-            g=DoSet(dictionary,v[0],vals[i])
+
+        # orig_val=DoGet(dictionary, v[0])
+        # if not orig_val:
+        #     if isinstance(orig_val, int):
+        #         val=int(val)
+        #     elif isinstance(orig_val, float):
+        #         val=float(val)
+        # print(datetime.datetime.now(),"---")
+        for i,v in enumerate(orig_vals): # required to keep consistency in setting items by index
+            # g=DoSet(dictionary,v[0],vals[i])
+
+            dpu.set(dictionary, v[0],vals[i])
+
+        # print(datetime.datetime.now(),"---")
+        save_gap_file(dictionary)
     else:
         print("Vals array is not same size as target params array")
 

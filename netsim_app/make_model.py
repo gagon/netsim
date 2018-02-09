@@ -3,75 +3,6 @@ from openpyxl import load_workbook
 import numpy as np
 
 
-well_dict={
-
-        "constraints": {
-            "fwhp_min": 130.0
-            },
-        "gor": 1600.0,
-        "label": "9815",
-        "masked": 0,
-        "maskflag": 0,
-        "pc": {
-            "fwhps": [
-                1.01,
-                250.0
-            ],
-            "qoil": [
-                1000.0,
-                0.0
-            ]
-        },
-        "results": {
-            "dp": 0.0,
-            "fwhp": 0.0,
-            "pres": 0.0,
-            "qgas": 0.0,
-            "qoil": 0.0,
-            "qwat": 0.0
-        },
-        "wct": 10.0
-
-}
-
-
-pipe_dict={
-
-    "corr": {
-        "a": 0.9,
-        "b": 0.0,
-        "type": "linear"
-    },
-    "from": "u3_inlet",
-    "id": 4.5,
-    "label": "u3_u3_inlet",
-    "lenght": 100.0,
-    "masked": 0,
-    "maskflag": 0,
-    "results": {
-        "dp": 0.0,
-        "pres": 0.0,
-        "qgas": 0.0,
-        "qoil": 0.0,
-        "qwat": 0.0
-    },
-    "to": "u3"
-
-}
-
-joint_dict={
-
-        "label": "",
-        "maskflag": 0,
-        "results": {
-            "pres": 0.0,
-            "qgas": 0.0,
-            "qoil": 0.0,
-            "qwat": 0.0
-        }
-
-}
-
 seps_dict={
     "seps": {
         "kpc": {
@@ -132,6 +63,7 @@ while conns.cell(row=r, column=1).value!=None:
             "label": well,
             "masked": 0,
             "maskflag": 0,
+            "dp_calc": 1,
             "pc": {
                 "fwhps": [
                     1.01,
@@ -195,9 +127,9 @@ while conns.cell(row=r, column=1).value!=None:
 
     pipe_dict={
         "corr": {
-            "a": 0.9,
+            "a": 0.09,
             "b": 0.0,
-            "type": "linear"
+            "type": "linear",
         },
         "from": from_item,
         "id": 4.5,
@@ -227,7 +159,7 @@ while conns.cell(row=r, column=5).value!=None:
     print("===2",to_item,from_item,pipe)
     pipe_dict={
         "corr": {
-            "a": 0.9,
+            "a": 0.09,
             "b": 0.0,
             "type": "linear"
         },
@@ -259,7 +191,7 @@ while conns.cell(row=r, column=9).value!=None:
     print("===3",to_item,from_item,pipe)
     pipe_dict={
         "corr": {
-            "a": 0.9,
+            "a": 0.09,
             "b": 0.0,
             "type": "linear"
         },
